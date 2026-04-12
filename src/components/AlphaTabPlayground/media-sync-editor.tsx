@@ -20,7 +20,9 @@ import {
     syncPointsToTypeScriptCode,
     syncPointsToCSharpCode,
     syncPointsToKotlinCode,
-    syncPointsToAlphaTex
+    syncPointsToAlphaTex,
+    moveMarker,
+    SyncPointMarkerType
 } from './sync-point-info';
 import { WaveformCanvas } from './waveform-canvas';
 import { SyncPointMarkerPanel } from './sync-point-marker-panel';
@@ -301,6 +303,65 @@ export const MediaSyncEditor: React.FC<MediaSyncEditorProps> = ({
             return s ? autoSync(s, api) : s;
         });
     };
+
+    const [isTapSyncing, setIsTapSyncing] = useState(false);
+    const tapSyncIndexRef = useRef(0);
+
+    const onStartTapSync = () => {
+        // find the first MasterBar marker index to start from
+        const firstMasterBar = syncPointInfo.syncPointMarkers.findIndex(
+            m => m.markerType === SyncPointMarkerType.MasterBar
+        );
+        tapSyncIndexRef.current = Math.max(0, firstMasterBar);
+        setIsTapSyncing(true);
+    };
+
+    const onTap = useCallback(() => {
+        setSyncPointInfo(s => {
+            const markers = s.syncPointMarkers;
+            const idx = tapSyncIndexRef.current;
+
+            if (idx >= markers.length) {
+                setIsTapSyncing(false);
+                return s;
+            }
+
+            const newS = moveMarker(s, markers[idx], playbackTime);
+
+            // advance to the next MasterBar or EndMarker
+            let nextIdx = idx + 1;
+            while (
+                nextIdx < markers.length &&
+                markers[nextIdx].markerType !== SyncPointMarkerType.MasterBar &&
+                markers[nextIdx].markerType !== SyncPointMarkerType.EndMarker
+            ) {
+                nextIdx++;
+            }
+
+            if (nextIdx >= markers.length) {
+                setIsTapSyncing(false);
+            }
+
+            tapSyncIndexRef.current = nextIdx;
+            shouldStoreToUndo.current = true;
+            return newS;
+        });
+    }, [playbackTime]);
+
+    const onStopTapSync = () => {
+        setIsTapSyncing(false);
+    };
+
+    useEffect(() => {
+        if (!isTapSyncing) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 't' && !e.repeat) {
+                onTap();
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => document.removeEventListener('keydown', onKeyDown);
+    }, [isTapSyncing, onTap]);
 
     return (
         <div className={styles['media-sync-editor']}>
@@ -607,6 +668,36 @@ export const MediaSyncEditor: React.FC<MediaSyncEditorProps> = ({
                         }}>
                         <FontAwesomeIcon icon={solid.faRedo} />
                     </button>
+
+                    {!isTapSyncing ? (
+                        <button
+                            className="button button--secondary"
+                            type="button"
+                            data-tooltip-id="tooltip-playground"
+                            data-tooltip-content="Tap bar positions while audio plays to set sync points"
+                            onClick={onStartTapSync}>
+                            <FontAwesomeIcon icon={solid.faHandPointer} /> Tap Sync
+                        </button>
+                    ) : (
+                        <>
+                            <button
+                                className="button button--primary"
+                                type="button"
+                                data-tooltip-id="tooltip-playground"
+                                data-tooltip-content="Tap to mark current bar position"
+                                onClick={onTap}>
+                                <FontAwesomeIcon icon={solid.faDrum} /> Tap
+                            </button>
+                            <button
+                                className="button button--danger"
+                                type="button"
+                                data-tooltip-id="tooltip-playground"
+                                data-tooltip-content="Stop tap sync"
+                                onClick={onStopTapSync}>
+                                <FontAwesomeIcon icon={solid.faStop} /> Stop
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <div>
