@@ -27,11 +27,12 @@ export const AlphaTabPlayground: React.FC = () => {
 
     const [api, element] = useAlphaTab(s => {
         s.core.engine = 'svg';
-        s.core.file = '/files/canon-full.gp';
+        s.core.file = '/files/avemaria.gp';
         s.core.tracks = [0, 1];
         s.player.scrollElement = viewPortRef.current!;
         s.player.scrollOffsetY = -10;
         s.player.playerMode = alphaTab.PlayerMode.EnabledSynthesizer;
+        s.display.systemsLayoutMode = alphaTab.SystemsLayoutMode.Automatic;
     });
 
     useAlphaTabEvent(api, 'renderFinished', () => {
