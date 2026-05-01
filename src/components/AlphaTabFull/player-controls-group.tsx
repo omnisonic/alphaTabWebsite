@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import { useAlphaTabEvent } from "@site/src/hooks";
 import { openFile, openInputFile } from "@site/src/utils";
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export interface PlayerControlsGroupProps {
   api: alphaTab.AlphaTabApi;
@@ -23,6 +24,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
   api,
   onLayoutChange,
 }) => {
+  const { siteConfig } = useDocusaurusContext();
   const [soundFontLoadPercentage, setSoundFontLoadPercentage] = useState(0);
   const [isLooping, setLooping] = useState(false);
   const [isCountInActive, setCountInActive] = useState(false);
@@ -219,7 +221,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
           <LayoutSelector onLayoutChange={onLayoutChange} />
 
           <div className={styles["at-logo"]}>
-            powered by <img src="/img/alphaTab.png" />
+            powered by <img src={`${siteConfig.baseUrl}img/alphaTab.png`} />
           </div>
         </div>
       </div>

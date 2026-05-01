@@ -8,12 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
 import { openFile } from '@site/src/utils';
 import { BottomPanel, PlayerControlsGroup, SidePanel } from './player-controls-group';
+import { debugScore, analyzeRestCollisions, printBarDebug, printCollisionAnalysis } from '@site/src/utils/scoreDebugger';
 import { PlaygroundSettings } from './playground-settings';
 import { Tooltip } from 'react-tooltip';
 import { PlaygroundTrackSelector } from './track-selector';
 import { MediaSyncEditor } from './media-sync-editor';
 import { type HTMLMediaElementLike, MediaType, type MediaTypeState } from './helpers';
 import { YouTubePlayer } from './youtube-player';
+import { ScoreDebugger } from './score-debugger';
 
 export const AlphaTabPlayground: React.FC = () => {
     const viewPortRef = React.createRef<HTMLDivElement>();
@@ -23,11 +25,12 @@ export const AlphaTabPlayground: React.FC = () => {
     const [mediaType, setMediaType] = useState<MediaTypeState>({
         type: MediaType.Synth
     });
+    const [isDebuggerOpen, setIsDebuggerOpen] = useState(false);
     const youtubePlayer = useRef<HTMLMediaElementLike | null>(null);
 
-    const [api, element] = useAlphaTab(s => {
+    const [api, element] = useAlphaTab((s, baseUrl) => {
         s.core.engine = 'svg';
-        s.core.file = '/files/avemaria.gp';
+        s.core.file = `${baseUrl}files/pavena.gp`;
         s.core.tracks = [0, 1];
         s.player.scrollElement = viewPortRef.current!;
         s.player.scrollOffsetY = -10;
@@ -40,6 +43,38 @@ export const AlphaTabPlayground: React.FC = () => {
     });
 
     useAlphaTabEvent(api, 'scoreLoaded', score => {
+        // Expose debug utilities on window for console inspection
+        (window as any).atDebug = {
+            score,
+            debugScore: () => debugScore(score),
+            analyzeBar: (barIndex: number) => {
+                for (const track of score.tracks) {
+                    for (const staff of track.staves) {
+                        const bar = staff.bars[barIndex];
+                        if (bar) {
+                            printBarDebug({ barIndex, voices: [], hasMultipleVoices: bar.isMultiVoice, voicesWithContent: 0 });
+                            printCollisionAnalysis(analyzeRestCollisions(bar));
+                        }
+                    }
+                }
+            },
+            findMultiVoiceBars: () => debugScore(score).map(b => b.barIndex),
+            checkBar: (barIndex: number) => {
+                for (const track of score.tracks) {
+                    for (const staff of track.staves) {
+                        const bar = staff.bars[barIndex];
+                        if (!bar) continue;
+                        console.log(`Bar ${barIndex}: isMultiVoice=${bar.isMultiVoice}`);
+                        bar.voices.forEach((v, i) => {
+                            console.log(`  Voice ${i}: isEmpty=${v.isEmpty}, isRestOnly=${v.isRestOnly}, beats=${v.beats.length}`);
+                            v.beats.forEach(b => console.log(`    Beat: isRest=${b.isRest}, playbackStart=${b.playbackStart}, style=${JSON.stringify(b.style?.colors)}`));
+                        });
+                    }
+                }
+            }
+        };
+        console.log('atDebug available. Try: atDebug.findMultiVoiceBars(), atDebug.checkBar(0)');
+
         if (score.backingTrack?.rawAudioFile) {
             setMediaType({
                 type: MediaType.Audio,
@@ -264,6 +299,32 @@ export const AlphaTabPlayground: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            <button
+                onClick={() => setIsDebuggerOpen(!isDebuggerOpen)}
+                style={{
+                    position: 'fixed',
+                    bottom: 160,
+                    right: 20,
+                    padding: '8px 12px',
+                    background: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 4,
+                    cursor: 'pointer',
+                    fontSize: 12,
+                    zIndex: 999
+                }}
+                title="Toggle score debugger">
+                {isDebuggerOpen ? 'Hide' : 'Debug'}
+            </button>
+
+            <ScoreDebugger
+                api={api}
+                isOpen={isDebuggerOpen}
+                onClose={() => setIsDebuggerOpen(false)}
+            />
+
             <Tooltip anchorSelect="[data-tooltip-content]" id="tooltip-playground" style={{ zIndex: 1200 }} />
         </>
     );

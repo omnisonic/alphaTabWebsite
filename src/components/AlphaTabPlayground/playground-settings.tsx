@@ -867,7 +867,7 @@ export const PlaygroundSettings: React.FC<PlaygroundSettingsProps> = ({ api, isO
                     <button
                         type="button"
                         onClick={() => {
-                            downloadFile();
+                            downloadFile(api);
                         }}
                         className="button button--sm button--secondary">
                         Export Guitar Pro

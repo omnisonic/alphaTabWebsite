@@ -5,8 +5,8 @@ import CodeBlock from '@theme/CodeBlock';
 import './styles.module.scss'
 
 export const AudioExportSample: React.FC = () => {
-    const [api, element] = useAlphaTab(s => {
-        s.core.file = '/files/Bach_Prelude_BWV999.gp';
+    const [api, element] = useAlphaTab((s, baseUrl) => {
+        s.core.file = `${baseUrl}files/Bach_Prelude_BWV999.gp`;
         s.player.playerMode = alphaTab.PlayerMode.EnabledSynthesizer;
         s.player.scrollMode = alphaTab.ScrollMode.Off;
         s.player.enableCursor = false;

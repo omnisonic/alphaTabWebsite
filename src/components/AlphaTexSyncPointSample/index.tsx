@@ -4,9 +4,11 @@ import styles from './styles.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import CodeBlock from '@theme/CodeBlock';
 
 export const AlphaTexSyncPointSample = () => {
+    const { siteConfig } = useDocusaurusContext();
     const [api, element] = useAlphaTab(s => {
         s.core.tex = true;
         s.player.playerMode = alphaTab.PlayerMode.EnabledBackingTrack;
@@ -36,7 +38,7 @@ export const AlphaTexSyncPointSample = () => {
     useEffect(() => {
         if (api) {
             const request = new XMLHttpRequest();
-            request.open('GET', '/files/Bach_Prelude_BWV999.ogg', true);
+            request.open('GET', `${siteConfig.baseUrl}files/Bach_Prelude_BWV999.ogg`, true);
             request.responseType = 'arraybuffer';
             request.onload = () => {
                 const score = alphaTab.importer.ScoreLoader.loadAlphaTex(tex, api!.settings);

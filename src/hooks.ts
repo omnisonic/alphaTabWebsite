@@ -5,7 +5,7 @@ import {useColorMode} from '@docusaurus/theme-common';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export function useAlphaTab(
-  settingsInit: (settings: alphaTab.Settings) => void,
+  settingsInit: (settings: alphaTab.Settings, baseUrl: string) => void,
 ): [
     api: alphaTab.AlphaTabApi | undefined,
     elementRef: React.RefObject<HTMLDivElement | null>
@@ -44,7 +44,7 @@ export function useAlphaTab(
 
       const settings = new alphaTab.Settings();
       environment.setAlphaTabDefaults(settings, colorMode, siteConfig.baseUrl);
-      settingsInit(settings);
+      settingsInit(settings, siteConfig.baseUrl);
 
       const newApi = new alphaTab.AlphaTabApi(container, settings);
       setApi(newApi);

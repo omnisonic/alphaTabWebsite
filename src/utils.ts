@@ -38,6 +38,7 @@ export function downloadFile(api: alphaTab.AlphaTabApi) {
 }
 
 
+
 const iOSPlatforms = new Set(['iPhone', 'iPad', 'iPod']);
 function isIOS() {
   // Tested: 
