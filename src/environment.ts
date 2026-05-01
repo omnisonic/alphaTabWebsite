@@ -21,9 +21,9 @@ function setAlphaTabColors(settings: alphaTab.Settings, colorMode: ColorMode) {
     }
 }
 
- function setAlphaTabDefaults(settings: alphaTab.Settings, colorMode: ColorMode) {
-    settings.core.fontDirectory = "/font/";
-    settings.player.soundFont = "/soundfont/sonivox.sf3";
+ function setAlphaTabDefaults(settings: alphaTab.Settings, colorMode: ColorMode, baseUrl: string = "/") {
+    settings.core.fontDirectory = `${baseUrl}font/`;
+    settings.player.soundFont = `${baseUrl}soundfont/sonivox.sf3`;
     settings.player.scrollMode = alphaTab.ScrollMode.Off;
     settings.player.playerMode = alphaTab.PlayerMode.Disabled;
 

@@ -1,6 +1,7 @@
 import * as alphaTab from "@coderline/alphatab";
 import React, { useEffect, useRef } from "react";
 import environment from "../../environment";
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import './styles.module.scss'
 import CodeBlock from '@theme/CodeBlock';
 
@@ -12,13 +13,13 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCod
     const alphaTabWithExternalMedia = useRef<HTMLDivElement>(null);
     const audio = useRef<HTMLAudioElement>(null);
     const updateTimer = useRef<number>(0);
-
+    const { siteConfig } = useDocusaurusContext();
 
     const api = useRef<alphaTab.AlphaTabApi>(null);
 
     useEffect(() => {
         const settings = new alphaTab.Settings();
-        environment.setAlphaTabDefaults(settings);
+        environment.setAlphaTabDefaults(settings, 'light', siteConfig.baseUrl);
         settings.core.file = '/files/Bach_Prelude_BWV999.gp';
         settings.player.playerMode = alphaTab.PlayerMode.EnabledExternalMedia;
         settings.player.scrollMode = alphaTab.ScrollMode.Off;

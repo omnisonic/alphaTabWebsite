@@ -2,6 +2,7 @@ import React, { type DependencyList, type EffectCallback, useEffect, useRef, use
 import * as alphaTab from "@coderline/alphatab";
 import environment from "./environment";
 import {useColorMode} from '@docusaurus/theme-common';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export function useAlphaTab(
   settingsInit: (settings: alphaTab.Settings) => void,
@@ -13,6 +14,7 @@ export function useAlphaTab(
   const element = React.createRef<HTMLDivElement>();
 
   const { colorMode } = useColorMode();
+  const { siteConfig } = useDocusaurusContext();
 
   useEffect(()=>{
     if(api) {
@@ -41,7 +43,7 @@ export function useAlphaTab(
       }
 
       const settings = new alphaTab.Settings();
-      environment.setAlphaTabDefaults(settings, colorMode);
+      environment.setAlphaTabDefaults(settings, colorMode, siteConfig.baseUrl);
       settingsInit(settings);
 
       const newApi = new alphaTab.AlphaTabApi(container, settings);

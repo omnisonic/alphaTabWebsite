@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";
 import environment from "@site/src/environment";
 import { useColorMode } from '@docusaurus/theme-common';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 type RasguadoItemMode = "down" | "up" | "head";
 type RasgueadoPatternItem = {
@@ -205,8 +206,9 @@ canvas.settings.display.scale = 1.5;
 export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
   const pattern = RasgueadoPatternDefinition.get(rasgueado)!;
   const { colorMode } = useColorMode();
+  const { siteConfig } = useDocusaurusContext();
 
-  environment.setAlphaTabDefaults(canvas.settings, colorMode);
+  environment.setAlphaTabDefaults(canvas.settings, colorMode, siteConfig.baseUrl);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
