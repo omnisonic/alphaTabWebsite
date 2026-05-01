@@ -89,11 +89,11 @@ function getSortValue(
 const config: Config = {
   title: "alphaTab",
   tagline: "Build modern music notation apps for web, desktop and mobile",
-  url: "https://alphatab.net",
-  baseUrl: "/",
+  url: "https://omnisonic.github.io",
+  baseUrl: "/alphaTabWebsite/",
   favicon: "img/favicon.ico",
-  organizationName: "CoderLine",
-  projectName: "alphaTab",
+  organizationName: "omnisonic",
+  projectName: "alphaTabWebsite",
   onBrokenLinks: "throw",
   customFields: {
     isPreRelease: isPreRelease,
