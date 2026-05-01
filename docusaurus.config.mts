@@ -389,7 +389,7 @@ const config: Config = {
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
               assetOutputDir: config.output!.path,
-              alphaTabSourceDir: path.resolve(require.resolve('@coderline/alphatab'), '..'),
+              alphaTabSourceDir: path.resolve(require.resolve('@coderline/alphatab'), '..', '..', '..', '..'),
             }),
           ],
           resolve: {
