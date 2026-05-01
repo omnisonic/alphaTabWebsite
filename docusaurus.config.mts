@@ -9,7 +9,9 @@ import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-di
 
 import * as path from "path";
 import * as fs from "fs";
+import { createRequire } from "module";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
+const require = createRequire(import.meta.url);
 import { RuleSetRule } from "webpack";
 
 const alphaTabVersionFull = JSON.parse(
@@ -387,6 +389,7 @@ const config: Config = {
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
               assetOutputDir: config.output!.path,
+              alphaTabSourceDir: path.resolve(require.resolve('@coderline/alphatab'), '..'),
             }),
           ],
           resolve: {
